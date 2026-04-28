@@ -200,7 +200,7 @@
         .metric-cascade {
             display: flex;
             flex-direction: column;
-            gap: 50px;
+            gap: 80px;
         }
 
         .metric-item {
@@ -227,6 +227,15 @@
             color: var(--ocean-blue);
             letter-spacing: -0.03em;
             margin-bottom: 12px;
+        }
+
+        .metric-context {
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.6;
+            margin-bottom: 16px;
         }
 
         .metric-label {
@@ -1022,16 +1031,19 @@
     <div class="hero-right">
         <div class="metric-cascade">
             <div class="metric-item">
+                <div class="metric-context">Cox SMB Value Prop</div>
                 <div class="metric-number">$217M</div>
-                <div class="metric-label">SMB Value Proposition</div>
+                <div class="metric-label">5-year revenue impact</div>
             </div>
             <div class="metric-item">
+                <div class="metric-context">Home Depot Cart/Checkout</div>
                 <div class="metric-number">$1B</div>
-                <div class="metric-label">Home Depot Platform</div>
+                <div class="metric-label">Platform GMV impact</div>
             </div>
             <div class="metric-item">
+                <div class="metric-context">Cox Customer Satisfaction</div>
                 <div class="metric-number">9→3</div>
-                <div class="metric-label">JD Power Ranking</div>
+                <div class="metric-label">J.D. Power ranking</div>
             </div>
         </div>
         
