@@ -68,7 +68,7 @@
   .skip:focus{left:0;}
 
   /* visible keyboard focus (mouse clicks unaffected) */
-  a:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:2px;}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:2px;}
   .cxos a:focus-visible,footer a:focus-visible{outline-color:#c8a983;}
 
   @media(prefers-reduced-motion:reduce){
@@ -193,16 +193,74 @@
   .trace h3{font-size:clamp(22px,2.4vw,28px);font-weight:800;color:var(--blue);letter-spacing:-0.01em;}
   .trace .kk{font-size:14px;color:var(--mut);margin:4px 0 14px;}
   .trace p{font-size:16.5px;color:#403b32;line-height:1.6;max-width:72ch;text-wrap:pretty;}
+  /* trace controls */
+  .tctl{display:flex;flex-wrap:wrap;justify-content:space-between;gap:18px 32px;align-items:flex-end;
+    margin-top:clamp(26px,3vw,34px);padding-bottom:16px;border-bottom:1px solid var(--line);}
+  .tctl .grp{display:flex;flex-direction:column;gap:10px;min-width:0;}
+  .tctl .cd{font-size:12.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--mut);
+    font-weight:600;}
+  .tctl .row{display:flex;flex-wrap:wrap;gap:8px;}
+  .tctl button{font-family:inherit;font-size:14px;font-weight:600;color:var(--mut);
+    background:transparent;border:1px solid var(--line);border-radius:5px;padding:8px 14px;
+    cursor:pointer;transition:color .15s,border-color .15s;}
+  .tctl button:hover{color:var(--ink);border-color:#c9c0af;}
+  .tctl button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+  /* trace chain, now selectable */
   .chain{margin-top:clamp(26px,3vw,34px);}
   .chain .cd{font-size:12.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--mut);
     font-weight:600;margin-bottom:12px;}
   .chain ol{list-style:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0 16px;}
-  .chain li{padding-top:14px;border-top:2px solid var(--line);font-size:14.5px;line-height:1.4;
-    color:#3a352c;min-width:0;overflow-wrap:break-word;}
-  .chain li b{display:block;font-size:12px;font-weight:700;color:var(--mut);margin-bottom:6px;
-    letter-spacing:0.02em;text-transform:uppercase;}
-  .chain li:last-child{border-top-color:var(--blue);font-weight:600;color:var(--ink);}
-  .chain li:last-child b{color:var(--blue);}
+  .chain li{min-width:0;}
+  .chain .lk{position:relative;display:block;width:100%;text-align:left;font-family:inherit;
+    background:transparent;border:none;border-top:2px solid var(--line);cursor:pointer;
+    padding:14px 8px 18px 0;font-size:14.5px;line-height:1.4;color:#3a352c;
+    overflow-wrap:break-word;transition:border-color .18s,opacity .18s;}
+  .chain .lk b{display:block;font-size:12px;font-weight:700;color:var(--mut);margin-bottom:6px;
+    letter-spacing:0.02em;text-transform:uppercase;transition:color .18s;}
+  .chain .lk:hover{border-top-color:#bdb2a0;}
+  .chain li:last-child .lk{border-top-color:var(--blue);font-weight:600;color:var(--ink);}
+  .chain li:last-child .lk b{color:var(--blue);}
+  .chain ol[data-sel] .lk{opacity:0.45;}
+  .chain .lk[aria-pressed="true"]{opacity:1;border-top-color:var(--ink);border-top-width:3px;
+    font-weight:600;color:var(--ink);}
+  .chain .lk[aria-pressed="true"] b{color:var(--ink);}
+  .chain .lk[data-rel="up"],.chain .lk[data-rel="down"]{opacity:0.9;}
+  .chain .lk[data-rel="up"]{border-top-color:var(--tob);}
+  .chain .lk[data-rel="down"]{border-top-color:var(--blue);}
+  .chain .mk{position:absolute;top:-10px;right:4px;font-size:11px;font-weight:700;line-height:1;
+    color:var(--paper);background:var(--ink);border-radius:3px;padding:3px 5px;opacity:0;
+    transition:opacity .18s;}
+  .chain .lk[data-rel="up"] .mk,.chain .lk[data-rel="down"] .mk{opacity:1;}
+  .chain .lk[data-rel="up"] .mk{background:var(--tob);}
+  .chain .lk[data-rel="down"] .mk{background:var(--blue);}
+
+  /* trace readout */
+  .tread{margin-top:clamp(26px,3vw,34px);background:var(--inset);border:1px solid var(--line);
+    border-radius:8px;overflow:hidden;}
+  .tread .hd{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;
+    padding:14px 22px;border-bottom:1px solid var(--line);}
+  .tread .hd span{font-size:12.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--mut);
+    font-weight:600;}
+  .tread .bd{padding:24px 22px 26px;}
+  .tread .prompt{font-family:'Newsreader',serif;font-style:italic;font-size:18px;color:var(--mut);}
+  .tread .sel{font-size:clamp(20px,2.2vw,25px);font-weight:700;letter-spacing:-0.018em;
+    line-height:1.2;color:var(--ink);max-width:36ch;}
+  .tread .why{margin-top:14px;font-size:16px;line-height:1.6;color:#403b32;max-width:64ch;
+    text-wrap:pretty;}
+  .tread .ends{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:24px;
+    border-top:1px solid var(--line);}
+  .tread .end{padding:18px 20px 14px;border-left:1px solid var(--line);}
+  .tread .end:first-child{border-left:none;padding-left:0;}
+  .tread .end .ec{font-size:12px;font-weight:700;letter-spacing:0.02em;text-transform:uppercase;
+    margin-bottom:8px;}
+  .tread .end.u .ec{color:var(--tob);}
+  .tread .end.d .ec{color:var(--blue);}
+  .tread .end .et{font-size:14.5px;line-height:1.5;color:#3a352c;}
+  .tread .end .et b{display:block;font-size:12px;font-weight:700;color:var(--mut);
+    letter-spacing:0.02em;text-transform:uppercase;margin-bottom:5px;}
+  .tread .end.term .et{font-family:'Newsreader',serif;font-style:italic;color:var(--mut);}
+  .thint{margin-top:14px;font-size:13px;color:var(--mut);}
 
   .about .wrap{display:grid;grid-template-columns:1fr 1.25fr;gap:clamp(32px,5vw,72px);align-items:start;}
   .about .family{aspect-ratio:4/5;border-radius:6px;border:1px solid var(--line);
@@ -240,6 +298,9 @@
   @media(max-width:860px){
     .nav-sec{display:none;}
     .chain ol{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:22px;}
+    .tread .ends{grid-template-columns:1fr;}
+    .tread .end{border-left:none;border-top:1px solid var(--line);padding-left:0;}
+    .tread .end:first-child{border-top:none;}
     .hero .wrap{grid-template-columns:1fr;}
     .portrait{max-width:300px;}
     .item{grid-template-columns:1fr;gap:6px;}
@@ -258,8 +319,13 @@
     .metrics .wrap{grid-template-columns:minmax(0,1fr);gap:24px;}
     .cxos .flow{grid-template-columns:repeat(2,minmax(0,1fr));}
     .chain ol{grid-template-columns:minmax(0,1fr);row-gap:0;}
-    .chain li{border-top:none;border-left:2px solid var(--line);padding:8px 0 8px 14px;}
-    .chain li:last-child{border-left-color:var(--blue);}
+    .chain .lk{border-top:none;border-left:2px solid var(--line);padding:10px 0 12px 15px;}
+    .chain li:last-child .lk{border-top:none;border-left-color:var(--blue);}
+    .chain .lk[aria-pressed="true"]{border-left-color:var(--ink);border-left-width:3px;
+      border-top-width:0;}
+    .chain .lk[data-rel="up"]{border-left-color:var(--tob);}
+    .chain .lk[data-rel="down"]{border-left-color:var(--blue);}
+    .chain .mk{top:10px;right:auto;left:-10px;}
     .cxos .in,.cxos .out{padding:26px;}
   }
 
@@ -501,29 +567,41 @@
   <div class="trace">
     <h3>The Trace</h3>
     <div class="kk">Every screen traceable to strategy</div>
-    <p>Moment Architecture decides where to invest. Experience IQ decides how to build it. The Trace is the audit: it runs a single line of interface copy all the way up to the business outcome it serves, then back down again. If a screen can't be traced in both directions, it isn't ready. Here it is on the Home Depot cart.</p>
+    <p>Moment Architecture decides where to invest. Experience IQ decides how to build it. The Trace is the audit: it runs a single decision, often just a line of interface copy, all the way up to the business outcome it serves, then back down again. If it can't be traced in both directions, it isn't ready. Pick a project and pull on any link.</p>
 
-    <div class="chain">
-      <div class="cd">Top down</div>
-      <ol>
-        <li><b>Business goal</b>Capture same-day demand without new infrastructure</li>
-        <li><b>Strategy</b>Turn 2,000+ existing stores into fulfillment centers</li>
-        <li><b>Capability</b>Real-time inventory and delivery-zone logic</li>
-        <li><b>Interaction</b>&ldquo;Get it today by 6pm&rdquo;</li>
-        <li><b>Outcome</b>8% of orders at 34% higher AOV</li>
-      </ol>
+    <div class="tctl">
+      <div class="grp">
+        <span class="cd" id="exLab">Worked example</span>
+        <div class="row" id="exRow" role="group" aria-labelledby="exLab">
+          <button type="button" data-ex="hd" aria-pressed="true">Home Depot cart</button>
+          <button type="button" data-ex="si" aria-pressed="false">Cox self-install</button>
+          <button type="button" data-ex="bc" aria-pressed="false">Becoming a customer</button>
+        </div>
+      </div>
+      <div class="grp">
+        <span class="cd" id="dirLab">Reading direction</span>
+        <div class="row" id="dirRow" role="group" aria-labelledby="dirLab">
+          <button type="button" data-dir="td" aria-pressed="true">Top down</button>
+          <button type="button" data-dir="bu" aria-pressed="false">Bottom up</button>
+        </div>
+      </div>
     </div>
 
     <div class="chain">
-      <div class="cd">Bottom up</div>
-      <ol>
-        <li><b>Cart copy</b>&ldquo;Get it today by 6pm,&rdquo; not &ldquo;Express Delivery&rdquo;</li>
-        <li><b>Mental model</b>A specific time creates urgency a category label can't</li>
-        <li><b>Behavior</b>Higher selection rate at the fulfillment choice</li>
-        <li><b>System impact</b>Same-day demand captured on assets we already had</li>
-        <li><b>Business value</b>Conversion +15%, AOV +34%</li>
-      </ol>
+      <div class="cd" id="chainDir">Top down</div>
+      <ol id="spine"></ol>
     </div>
+
+    <div class="tread" id="readout" aria-live="polite">
+      <div class="hd">
+        <span id="roCtx">Home Depot cart &mdash; top down</span>
+        <span id="roPos">Five links</span>
+      </div>
+      <div class="bd" id="roBody">
+        <p class="prompt">Select any link to see what it answers to, and what it produces.</p>
+      </div>
+    </div>
+    <p class="thint">Arrow keys move along the chain. Esc clears.</p>
   </div>
 </div></section>
 
@@ -576,5 +654,205 @@
   </div>
 </div></footer>
 
+<script>
+(function(){
+  var DATA = {
+    hd: {
+      name: 'Home Depot cart',
+      td: [
+        {lb:'Business goal', tx:'Capture same-day demand without new infrastructure',
+         why:'Prime had already set the expectation. Matching it by building dedicated warehouses would have cost more than the demand was worth, so the goal carried a constraint inside it from day one.'},
+        {lb:'Strategy', tx:'Turn 2,000+ existing stores into fulfillment centers',
+         why:'The asset was already paid for and already sitting within a short drive of almost every customer. Nobody was using it this way, which is what made it a strategy rather than a budget request.'},
+        {lb:'Capability', tx:'Real-time inventory and delivery-zone logic',
+         why:'A promise about today only holds if the system knows what is actually on the shelf and how far the truck has to go. This is where a strategy stops being a slide.'},
+        {lb:'Interaction', tx:'“Get it today by 6pm”',
+         why:'The capability is invisible until it becomes a sentence a customer believes. Six words in a radio button are the entire surface area of everything above them.'},
+        {lb:'Outcome', tx:'8% of orders at 34% higher AOV',
+         why:'Eight percent of a billion-dollar cart, at a bigger basket, running on infrastructure that already existed. Conversion moved 15% and CSAT moved 14 points with it.'}
+      ],
+      bu: [
+        {lb:'Cart copy', tx:'“Get it today by 6pm,” not “Express Delivery”',
+         why:'Start at the smallest real unit of the experience. Not the feature, not the flow. The words.'},
+        {lb:'Mental model', tx:'A specific time creates urgency a category label can’t',
+         why:'“Express” asks the customer to translate a category into a benefit. “By 6pm” lands directly against something already on their calendar.'},
+        {lb:'Behavior', tx:'Higher selection rate at the fulfillment choice',
+         why:'If the reframe is right, it shows up as a measurable change at the exact moment of choice. If it doesn’t, the reframe was a preference.'},
+        {lb:'System impact', tx:'Same-day demand captured on assets we already had',
+         why:'The behavior change is the thing that actually converts 2,000 retail stores into a fulfillment network. Without it, the capability is just cost.'},
+        {lb:'Business value', tx:'Conversion +15%, AOV +34%',
+         why:'Six words, traced all the way to the P&L and back down again without a gap. That is the whole test.'}
+      ]
+    },
+    si: {
+      name: 'Cox self-install',
+      td: [
+        {lb:'Business goal', tx:'Remove ~$7M a year in avoidable truck rolls',
+         why:'Every self-install a customer couldn’t finish sent a technician to a house that didn’t need one, plus a call, a chat, and sometimes a cancellation.'},
+        {lb:'Strategy', tx:'Prevent failure during setup instead of troubleshooting after it',
+         why:'Support after the fact is cheaper than a truck but it is not free, and it still leaves a bad first impression. The only real win is the customer finishing.'},
+        {lb:'Capability', tx:'Real-time connection status and adaptive troubleshooting',
+         why:'The flow has to know what is actually failing before it can say anything useful about it. Generic instructions are what produced the 30% in the first place.'},
+        {lb:'Interaction', tx:'“Plug in Your Modem,” with the cable and port drawn for the device in the box',
+         why:'A non-technical customer doesn’t need better instructions. They need to see which cable goes into which port on the modem actually sitting in front of them.'},
+        {lb:'Outcome', tx:'Failed installs from 30% to 3%',
+         why:'About 90% of failures removed, against roughly 50,000 failures a year at $150 a truck roll.'}
+      ],
+      bu: [
+        {lb:'The screen', tx:'The equipment-connection step, drawn for the customer’s actual device',
+         why:'This single step was where 30% of all failures happened, which is why Moment Architecture classified it as a critical moment and why the work started here.'},
+        {lb:'Mental model', tx:'Show the port, don’t describe it',
+         why:'Text assumes expertise the customer doesn’t have and can’t fake. A picture of their own modem assumes nothing.'},
+        {lb:'Behavior', tx:'Customers stop abandoning at the connection step',
+         why:'The failure was never motivation. People wanted their internet working. It was a missing visual.'},
+        {lb:'System impact', tx:'~90% of failures removed, ~50,000 truck rolls avoided a year',
+         why:'One prevented failure is one technician who never gets dispatched, and one first week that doesn’t start with an apology.'},
+        {lb:'Business value', tx:'~$7M annual OpEx',
+         why:'50,000 × $150 × 90%. The screen and the savings turn out to be the same object viewed from two ends.'}
+      ]
+    },
+    bc: {
+      name: 'Becoming a customer',
+      td: [
+        {lb:'Business goal', tx:'Move a 9th-of-10 J.D. Power ranking',
+         why:'Every business unit blamed another one, and nobody owned the system a new customer actually moved through, which meant nobody could move the number.'},
+        {lb:'Strategy', tx:'Run Becoming a Customer as one program, one owner, across five orgs',
+         why:'Patching handoffs one at a time fails systemically. The unit of ownership had to become the journey itself, spanning Product, Sales, Support, Field Operations, and Technology.'},
+        {lb:'Capability', tx:'A mapped 120-day journey, with Moment Architecture deciding where to invest',
+         why:'Thirty-five moments mattered. Treating all of them as equal would have spread the budget evenly and moved nothing.'},
+        {lb:'Intervention', tx:'Field-tech compensation changed from install speed to include retention',
+         why:'The moment that drove satisfaction wasn’t a screen at all. It was what the technician was paid to optimize for. Four months of work to change one incentive.'},
+        {lb:'Outcome', tx:'J.D. Power 9th to 3rd',
+         why:'Post-install CSAT up 23%, support calls down 18%, 90-day churn down 8%. Three independent measures moving the same direction.'}
+      ],
+      bu: [
+        {lb:'What happened', tx:'Technicians optimized for speed, because speed is what got measured',
+         why:'Same method, smallest real unit — except here the unit is an incentive rather than a line of copy. The trace doesn’t care which.'},
+        {lb:'Mental model', tx:'“Every step felt like starting over with a new team”',
+         why:'A customer experiences org boundaries as abandonment. They don’t know the boundaries exist, so they read the seams as indifference.'},
+        {lb:'System impact', tx:'One owner and one set of outcomes across five orgs',
+         why:'Shared outcomes are the only thing that makes five organizations behave like one system. Governance without shared metrics is a meeting.'},
+        {lb:'Journey impact', tx:'CSAT +23%, support calls −18%, churn −8%',
+         why:'Thirty-five moments redesigned, and the movement shows up in satisfaction, in cost, and in retention rather than in just one of the three.'},
+        {lb:'Business value', tx:'J.D. Power 9th to 3rd',
+         why:'The chain runs the same in both directions. If it hadn’t, the program was theater.'}
+      ]
+    }
+  };
+
+  var ex = 'hd', dir = 'td', sel = null;
+  var spine    = document.getElementById('spine');
+  var roBody   = document.getElementById('roBody');
+  var roCtx    = document.getElementById('roCtx');
+  var roPos    = document.getElementById('roPos');
+  var chainDir = document.getElementById('chainDir');
+  var exRow    = document.getElementById('exRow');
+  var dirRow   = document.getElementById('dirRow');
+  if(!spine || !roBody || !exRow || !dirRow) return;
+
+  function esc(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function dirName(d){ return d === 'td' ? 'top down' : 'bottom up'; }
+  function chain(){ return DATA[ex][dir]; }
+
+  function renderSpine(){
+    var c = chain();
+    spine.innerHTML = '';
+    c.forEach(function(step, i){
+      var li = document.createElement('li');
+      var b  = document.createElement('button');
+      b.className = 'lk';
+      b.type = 'button';
+      b.setAttribute('aria-pressed','false');
+      b.innerHTML = '<span class="mk" aria-hidden="true"></span><b>' +
+                    esc(step.lb) + '</b>' + esc(step.tx);
+      b.addEventListener('click', function(){ select(i === sel ? null : i); });
+      li.appendChild(b);
+      spine.appendChild(li);
+    });
+    paint();
+  }
+
+  function buttons(){
+    return Array.prototype.map.call(spine.children, function(li){
+      return li.firstChild;
+    });
+  }
+
+  function paint(){
+    var btns = buttons();
+    if (sel === null) spine.removeAttribute('data-sel');
+    else spine.setAttribute('data-sel', String(sel));
+
+    btns.forEach(function(b, i){
+      b.setAttribute('aria-pressed', i === sel ? 'true' : 'false');
+      b.removeAttribute('data-rel');
+      var mk = b.querySelector('.mk');
+      mk.textContent = '';
+      if (sel === null) return;
+      if (i < sel){ b.setAttribute('data-rel','up');   mk.textContent = '↑'; }
+      if (i > sel){ b.setAttribute('data-rel','down'); mk.textContent = '↓'; }
+    });
+
+    chainDir.textContent = dir === 'td' ? 'Top down' : 'Bottom up';
+    roCtx.textContent = DATA[ex].name + ' — ' + dirName(dir);
+    roPos.textContent = sel === null ? 'Five links' : 'Link ' + (sel + 1) + ' of 5';
+
+    if (sel === null){
+      roBody.innerHTML = '<p class="prompt">Select any link to see what it answers to, and what it produces.</p>';
+      return;
+    }
+
+    var c = chain(), s = c[sel], up = c[sel - 1], dn = c[sel + 1];
+    var upBlock = up
+      ? '<div class="end u"><div class="ec">↑ Answers to</div><div class="et"><b>' + esc(up.lb) + '</b>' + esc(up.tx) + '</div></div>'
+      : '<div class="end u term"><div class="ec">↑ Answers to</div><div class="et">Top of the chain. Nothing above this to justify it, which is why it has to be a real business goal and not a design one.</div></div>';
+    var dnBlock = dn
+      ? '<div class="end d"><div class="ec">↓ Produces</div><div class="et"><b>' + esc(dn.lb) + '</b>' + esc(dn.tx) + '</div></div>'
+      : '<div class="end d term"><div class="ec">↓ Produces</div><div class="et">End of the chain. If the trace holds this far, the decision earned its place.</div></div>';
+
+    roBody.innerHTML =
+      '<p class="sel">' + esc(s.tx) + '</p>' +
+      '<p class="why">' + esc(s.why) + '</p>' +
+      '<div class="ends">' + upBlock + dnBlock + '</div>';
+  }
+
+  function select(i){ sel = i; paint(); }
+
+  exRow.addEventListener('click', function(e){
+    var b = e.target.closest('button'); if (!b) return;
+    ex = b.getAttribute('data-ex'); sel = null;
+    Array.prototype.forEach.call(this.children, function(x){
+      x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+    });
+    renderSpine();
+  });
+
+  dirRow.addEventListener('click', function(e){
+    var b = e.target.closest('button'); if (!b) return;
+    dir = b.getAttribute('data-dir'); sel = null;
+    Array.prototype.forEach.call(this.children, function(x){
+      x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+    });
+    renderSpine();
+  });
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape'){ if (sel !== null) select(null); return; }
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft' &&
+        e.key !== 'ArrowDown'  && e.key !== 'ArrowUp') return;
+    if (!spine.contains(document.activeElement)) return;
+    e.preventDefault();
+    var fwd  = (e.key === 'ArrowRight' || e.key === 'ArrowDown');
+    var next = sel === null ? (fwd ? 0 : 4)
+                            : Math.min(4, Math.max(0, sel + (fwd ? 1 : -1)));
+    select(next);
+    buttons()[next].focus();
+  });
+
+  renderSpine();
+})();
+</script>
 </body>
 </html>
