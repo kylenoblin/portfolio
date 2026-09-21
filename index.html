@@ -262,6 +262,10 @@
   .tread .end.term .et{font-family:'Newsreader',serif;font-style:italic;color:var(--mut);}
   .thint{margin-top:14px;font-size:13px;color:var(--mut);}
 
+  /* inline detail. only used at narrow widths, where a detail panel below the
+     whole chain would mean scrolling back and forth for every selection. */
+  .chain .det{display:none;}
+
   .about .wrap{display:grid;grid-template-columns:1fr 1.25fr;gap:clamp(32px,5vw,72px);align-items:start;}
   .about .family{aspect-ratio:4/5;border-radius:6px;border:1px solid var(--line);
     background-color:var(--tintw);background-image:url('noblin-family.jpg');background-size:cover;background-position:center;
@@ -326,6 +330,29 @@
     .chain .lk[data-rel="up"]{border-left-color:var(--tob);}
     .chain .lk[data-rel="down"]{border-left-color:var(--blue);}
     .chain .mk{top:10px;right:auto;left:-10px;}
+
+    /* the detail opens under the link you tapped, so nothing moves out of reach */
+    .tread{display:none;}
+    .thint{display:none;}
+    .chain .det:not(:empty){display:block;margin:2px 0 14px 15px;padding:16px 17px 14px;
+      background:var(--inset);border:1px solid var(--line);border-radius:6px;}
+    .chain .det .why{font-size:15px;line-height:1.56;color:#403b32;}
+    .chain .det .ln{margin-top:13px;padding-top:12px;border-top:1px solid var(--line);
+      font-size:14px;line-height:1.45;color:#3a352c;}
+    .chain .det .ln .ec{display:block;font-size:11.5px;font-weight:700;letter-spacing:0.02em;
+      text-transform:uppercase;margin-bottom:4px;}
+    .chain .det .ln.u .ec{color:var(--tob);}
+    .chain .det .ln.d .ec{color:var(--blue);}
+    .chain .det .ln i{font-style:normal;font-weight:700;color:var(--mut);}
+    .chain .det .ln.term{font-family:'Newsreader',serif;font-style:italic;color:var(--mut);}
+    .chain .det .stp{display:flex;align-items:center;justify-content:space-between;gap:10px;
+      margin-top:15px;padding-top:13px;border-top:1px solid var(--line);}
+    .chain .det .stp button{font-family:inherit;font-size:13.5px;font-weight:600;color:var(--blue);
+      background:transparent;border:1px solid var(--line);border-radius:5px;padding:8px 12px;
+      cursor:pointer;}
+    .chain .det .stp button[disabled]{color:var(--mut);opacity:0.45;cursor:default;}
+    .chain .det .stp .pos{font-size:12px;letter-spacing:0.05em;text-transform:uppercase;
+      color:var(--mut);font-weight:600;}
     .cxos .in,.cxos .out{padding:26px;}
   }
 
@@ -750,6 +777,13 @@
   var dirRow   = document.getElementById('dirRow');
   if(!spine || !roBody || !exRow || !dirRow) return;
 
+  /* Below 640px the chain stacks into five rows, so a detail panel underneath it
+     would mean scrolling down and back up for every selection. At that width the
+     detail renders inline instead, directly under the link that was tapped.
+     This breakpoint must match the one that stacks .chain ol in the CSS. */
+  var mq = window.matchMedia('(max-width: 640px)');
+  function inline(){ return mq.matches; }
+
   function esc(s){
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
@@ -767,8 +801,13 @@
       b.setAttribute('aria-pressed','false');
       b.innerHTML = '<span class="mk" aria-hidden="true"></span><b>' +
                     esc(step.lb) + '</b>' + esc(step.tx);
+      b.setAttribute('aria-controls', 'trace-det-' + i);
       b.addEventListener('click', function(){ select(i === sel ? null : i); });
+      var d = document.createElement('div');
+      d.className = 'det';
+      d.id = 'trace-det-' + i;
       li.appendChild(b);
+      li.appendChild(d);
       spine.appendChild(li);
     });
     paint();
@@ -776,17 +815,28 @@
 
   function buttons(){
     return Array.prototype.map.call(spine.children, function(li){
-      return li.firstChild;
+      return li.querySelector('.lk');
+    });
+  }
+  function dets(){
+    return Array.prototype.map.call(spine.children, function(li){
+      return li.querySelector('.det');
     });
   }
 
+  var TOP_TERM = 'Top of the chain. Nothing above this to justify it, which is why it has to be a real business goal and not a design one.';
+  var END_TERM = 'End of the chain. If the trace holds this far, the decision earned its place.';
+
   function paint(){
-    var btns = buttons();
+    var btns = buttons(), dt = dets(), useInline = inline();
+
     if (sel === null) spine.removeAttribute('data-sel');
     else spine.setAttribute('data-sel', String(sel));
 
     btns.forEach(function(b, i){
       b.setAttribute('aria-pressed', i === sel ? 'true' : 'false');
+      if (useInline) b.setAttribute('aria-expanded', i === sel ? 'true' : 'false');
+      else b.removeAttribute('aria-expanded');
       b.removeAttribute('data-rel');
       var mk = b.querySelector('.mk');
       mk.textContent = '';
@@ -799,18 +849,39 @@
     roCtx.textContent = DATA[ex].name + ' — ' + dirName(dir);
     roPos.textContent = sel === null ? 'Five links' : 'Link ' + (sel + 1) + ' of 5';
 
+    dt.forEach(function(d){ d.innerHTML = ''; });
+
     if (sel === null){
       roBody.innerHTML = '<p class="prompt">Select any link to see what it answers to, and what it produces.</p>';
       return;
     }
 
     var c = chain(), s = c[sel], up = c[sel - 1], dn = c[sel + 1];
+
+    if (useInline){
+      roBody.innerHTML = '';
+      var upLn = up
+        ? '<div class="ln u"><span class="ec">↑ Answers to</span><i>' + esc(up.lb) + '.</i> ' + esc(up.tx) + '</div>'
+        : '<div class="ln u term"><span class="ec">↑ Answers to</span>' + TOP_TERM + '</div>';
+      var dnLn = dn
+        ? '<div class="ln d"><span class="ec">↓ Produces</span><i>' + esc(dn.lb) + '.</i> ' + esc(dn.tx) + '</div>'
+        : '<div class="ln d term"><span class="ec">↓ Produces</span>' + END_TERM + '</div>';
+      dt[sel].innerHTML =
+        '<p class="why">' + esc(s.why) + '</p>' + upLn + dnLn +
+        '<div class="stp">' +
+          '<button type="button" data-step="-1"' + (sel === 0 ? ' disabled' : '') + '>&larr; Prev</button>' +
+          '<span class="pos">Link ' + (sel + 1) + ' of 5</span>' +
+          '<button type="button" data-step="1"' + (sel === 4 ? ' disabled' : '') + '>Next &rarr;</button>' +
+        '</div>';
+      return;
+    }
+
     var upBlock = up
       ? '<div class="end u"><div class="ec">↑ Answers to</div><div class="et"><b>' + esc(up.lb) + '</b>' + esc(up.tx) + '</div></div>'
-      : '<div class="end u term"><div class="ec">↑ Answers to</div><div class="et">Top of the chain. Nothing above this to justify it, which is why it has to be a real business goal and not a design one.</div></div>';
+      : '<div class="end u term"><div class="ec">↑ Answers to</div><div class="et">' + TOP_TERM + '</div></div>';
     var dnBlock = dn
       ? '<div class="end d"><div class="ec">↓ Produces</div><div class="et"><b>' + esc(dn.lb) + '</b>' + esc(dn.tx) + '</div></div>'
-      : '<div class="end d term"><div class="ec">↓ Produces</div><div class="et">End of the chain. If the trace holds this far, the decision earned its place.</div></div>';
+      : '<div class="end d term"><div class="ec">↓ Produces</div><div class="et">' + END_TERM + '</div></div>';
 
     roBody.innerHTML =
       '<p class="sel">' + esc(s.tx) + '</p>' +
@@ -819,6 +890,23 @@
   }
 
   function select(i){ sel = i; paint(); }
+
+  /* prev / next inside the inline detail */
+  spine.addEventListener('click', function(e){
+    var b = e.target.closest('button[data-step]');
+    if (!b || b.disabled || sel === null) return;
+    var next = Math.min(4, Math.max(0, sel + parseInt(b.getAttribute('data-step'), 10)));
+    if (next === sel) return;
+    select(next);
+    var target = buttons()[next];
+    if (target){
+      target.focus({preventScroll:true});
+      target.scrollIntoView({block:'nearest'});
+    }
+  });
+
+  if (mq.addEventListener) mq.addEventListener('change', paint);
+  else if (mq.addListener) mq.addListener(paint);
 
   exRow.addEventListener('click', function(e){
     var b = e.target.closest('button'); if (!b) return;
